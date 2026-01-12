@@ -2,252 +2,391 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>AI Trash Detector</title>
+<title>AI Trash Detection Project</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&display=swap" rel="stylesheet">
+<!-- Michroma Font -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Michroma&display=swap" rel="stylesheet">
 
-<style>
+<style>        
+/* ===== RESET ===== */
 *{
     margin:0;
     padding:0;
     box-sizing:border-box;
-    font-family:'Orbitron', sans-serif;
+    font-family:'Michroma', sans-serif;
 }
 
+/* ===== CURSOR GLOW ===== */
+.cursor{
+    position:fixed;
+    width:24px;
+    height:24px;
+    border-radius:50%;
+    pointer-events:none;
+    background:radial-gradient(circle, rgba(0,255,255,.6), transparent 70%);
+    mix-blend-mode:screen;
+    z-index:99999;
+    transform:translate(-50%,-50%);
+}
+
+/* ===== CINEMATIC WELCOME SCREEN ===== */
+#welcome{
+    position:fixed;
+    inset:0;
+    background:#01020a;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:9999;
+    overflow:hidden;
+    animation:fadeOut 1.5s ease forwards;
+    animation-delay:3.5s;
+}
+
+/* Floating background lines */
+#welcome::before, #welcome::after {
+    content:'';
+    position:absolute;
+    width:200%;
+    height:200%;
+    top:-50%;
+    left:-50%;
+    background:repeating-linear-gradient(
+        45deg,
+        rgba(0,255,255,0.05),
+        rgba(0,255,255,0.05) 2px,
+        transparent 2px,
+        transparent 6px
+    );
+    animation:rotateLines 15s linear infinite;
+    z-index:1;
+}
+
+#welcome::after {
+    background:repeating-linear-gradient(
+        -45deg,
+        rgba(255,0,255,0.05),
+        rgba(255,0,255,0.05) 2px,
+        transparent 2px,
+        transparent 6px
+    );
+    animation-duration:18s;
+}
+
+/* Heading with neon/flicker/glitch effect */
+#welcome h1{
+    font-size:3rem;
+    color:cyan;
+    text-align:center;
+    text-transform: uppercase;
+    letter-spacing:2px;
+    z-index:2;
+    position:relative;
+    animation:neonGlow 2s infinite alternate, flicker 3s infinite;
+}
+
+/* Neon glow colors */
+@keyframes neonGlow{
+    0%{ text-shadow:0 0 15px cyan, 0 0 30px #0ff, 0 0 45px cyan; }
+    25%{ text-shadow:0 0 20px magenta, 0 0 35px violet, 0 0 50px cyan; }
+    50%{ text-shadow:0 0 25px gold, 0 0 40px orange, 0 0 55px yellow; }
+    75%{ text-shadow:0 0 20px cyan, 0 0 35px #0ff, 0 0 50px #0ff; }
+    100%{ text-shadow:0 0 15px cyan, 0 0 30px #0ff, 0 0 45px cyan; }
+}
+
+/* Flicker/glitch effect */
+@keyframes flicker{
+    0%, 19%, 21%, 23%, 25%, 54%, 56%, 100%{ opacity:1; transform: translate(0,0); }
+    20%{ opacity:0.8; transform: translate(-2px,1px); }
+    22%{ opacity:0.7; transform: translate(2px,-1px); }
+    24%{ opacity:0.85; transform: translate(-1px,2px); }
+    55%{ opacity:0.75; transform: translate(1px,-2px); }
+}
+
+/* Background line rotation */
+@keyframes rotateLines{
+    0%{ transform: rotate(0deg); }
+    100%{ transform: rotate(360deg); }
+}
+
+/* Fade out welcome screen */
+@keyframes fadeOut{
+    to{ opacity:0; visibility:hidden; }
+}
+
+/* ===== DARK AI BACKGROUND ===== */
 body{
-    background:radial-gradient(circle at top,#061b5e,#020024);
     min-height:100vh;
-    color:#e6f3ff;
+    background:
+        radial-gradient(circle at 15% 25%, rgba(0,180,255,0.12), transparent 45%),
+        radial-gradient(circle at 85% 70%, rgba(120,0,255,0.10), transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(0,255,180,0.06), transparent 55%),
+        linear-gradient(135deg, #02030a, #03091a, #020814);
+    background-size:300% 300%;
+    animation:darkFlow 30s ease-in-out infinite;
+    color:white;
     overflow-x:hidden;
 }
 
-/* AI BACKGROUND */
-#ai-bg{
+/* FLOATING LIGHT ORBS */
+.light-orb{
     position:fixed;
-    inset:0;
+    width:160px;
+    height:160px;
+    background:radial-gradient(circle, rgba(0,255,255,0.08), transparent 70%);
+    border-radius:50%;
+    filter:blur(28px);
+    animation:floatOrb 25s linear infinite;
+    pointer-events:none;
     z-index:-1;
-    opacity:0.35;
 }
 
-/* INTRO */
-.intro-overlay{
-    position:fixed;
-    inset:0;
-    background:#020024;
+.light-orb:nth-child(1){ top:20%; left:10%; }
+.light-orb:nth-child(2){ top:65%; left:80%; animation-duration:32s; }
+.light-orb:nth-child(3){ top:40%; left:50%; animation-duration:28s; }
+
+@keyframes floatOrb{
+    0%{ transform:translate(0,0); }
+    50%{ transform:translate(80px,-100px); }
+    100%{ transform:translate(0,0); }
+}
+
+/* ===== HEADER ===== */
+.header{
+    height:380px;
     display:flex;
-    align-items:center;
     justify-content:center;
-    z-index:999;
-}
-
-.intro-overlay h1{
-    text-align:center;
-    font-size:3rem;
-    color:#4fc3ff;
-    letter-spacing:6px;
-    cursor:pointer;
-    animation:boot 2s infinite alternate;
-}
-
-@keyframes boot{
-    from{opacity:.6;text-shadow:0 0 10px #4fc3ff;}
-    to{opacity:1;text-shadow:0 0 35px #4fc3ff;}
-}
-
-/* HEADER */
-header{
-    padding:25px;
-    display:flex;
-    flex-direction:column;
     align-items:center;
-    gap:20px;
 }
 
-.college-image{
+.header img{
     width:100%;
-    max-width:850px;
-    border-radius:18px;
-    box-shadow:0 0 40px rgba(79,195,255,.5);
-    transition:.5s;
+    height:100%;
+    object-fit:contain;
+    transition:.8s;
+    box-shadow:0 0 25px cyan;
 }
 
-.college-image:hover{
-    transform:scale(1.05);
+.header:hover img{
+    transform:scale(1.08);
+    filter:drop-shadow(0 0 40px cyan);
 }
 
-/* MAIN */
+/* ===== LOGO ===== */
+.logo-container{
+    height:220px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.logo{
+    width:150px;
+    height:150px;
+    border-radius:50%;
+    border:3px solid cyan;
+    box-shadow:0 0 40px rgba(0,255,255,.8), 0 0 25px #0ff inset;
+    transition:1s;
+}
+
+.logo:hover{
+    transform:rotate(360deg) scale(1.2);
+    box-shadow:0 0 60px gold, 0 0 35px orange inset;
+}
+
+/* ===== CONTENT ===== */
 .container{
-    max-width:900px;
-    margin:auto;
-    padding:60px 20px;
     display:flex;
     flex-direction:column;
     gap:45px;
+    padding:60px 12%;
 }
 
+/* ===== BOX ===== */
 .box{
+    background:linear-gradient(145deg,#0a1c3a,#050f25);
+    border-radius:26px;
+    padding:40px;
+    box-shadow:0 0 45px rgba(0,255,255,.22), 0 0 25px rgba(0,255,255,.15) inset;
+    opacity:0;
+    transform:translateY(90px);
+    transition:.7s ease, box-shadow 0.5s ease;
+}
+
+.box.show{
+    opacity:1;
+    transform:translateY(0);
+}
+
+.box:hover{
+    transform:scale(1.05);
+    box-shadow:0 0 65px rgba(0,255,255,.6), 0 0 35px rgba(0,255,255,.3) inset;
+}
+
+/* ===== HEADINGS EFFECT ===== */
+.box h2{
+    text-align:center;
+    color:cyan;
+    margin-bottom:25px;
+    transition:.4s ease;
     position:relative;
-    background:rgba(10,60,150,.25);
-    backdrop-filter:blur(18px);
-    border-radius:22px;
-    padding:35px;
-    box-shadow:0 0 45px rgba(79,195,255,.35);
-    overflow:hidden;
+    font-size:1.8rem;
 }
 
-.box::before{
-    content:"";
+.box h2::after{
+    content:'';
     position:absolute;
-    inset:0;
-    background:linear-gradient(120deg,transparent,rgba(79,195,255,.3),transparent);
-    animation:scan 3s linear infinite;
+    width:0%;
+    height:3px;
+    bottom:-6px;
+    left:0;
+    background:cyan;
+    transition:width 0.4s ease;
+    border-radius:3px;
 }
 
-@keyframes scan{
-    from{transform:translateX(-100%)}
-    to{transform:translateX(100%)}
+.box h2:hover::after{
+    width:100%;
+    background:gold;
 }
 
-h1,h2{
-    text-align:center;
-    animation:glow 2.5s infinite alternate;
+.box h2:hover{
+    color:gold;
+    letter-spacing:2px;
+    text-shadow:0 0 22px gold, 0 0 35px rgba(255,215,0,0.3);
 }
 
-@keyframes glow{
-    from{text-shadow:0 0 10px #4fc3ff;}
-    to{text-shadow:0 0 30px #4fc3ff;}
-}
-
-.names{
-    display:flex;
-    flex-wrap:wrap;
-    justify-content:center;
-    gap:20px;
-    margin-top:25px;
-}
-
-.name-card{
-    padding:14px 26px;
+/* ===== SLOT ===== */
+.slot{
+    background:rgba(255,255,255,.07);
+    padding:15px;
     border-radius:14px;
-    background:rgba(79,195,255,.2);
-    transition:.4s;
-}
-
-.name-card:hover{
-    background:#e6f3ff;
-    color:#020024;
-    transform:scale(1.1);
-}
-
-/* BUTTONS */
-.btns{
-    display:flex;
-    justify-content:center;
-    gap:30px;
-    flex-wrap:wrap;
-}
-
-.btns a{
-    padding:18px 45px;
-    text-decoration:none;
-    font-size:1.2rem;
-    color:white;
-    border-radius:50px;
-    background:linear-gradient(135deg,#4fc3ff,#1a5cff);
-    box-shadow:0 0 30px #4fc3ff;
-    transition:.4s;
-}
-
-.btns a:hover{
-    background:#e6f3ff;
-    color:#1a5cff;
-    transform:scale(1.1);
-}
-
-footer{
+    margin:12px auto;
+    max-width:320px;
     text-align:center;
-    padding:20px;
-    opacity:.85;
+    transition:.35s, box-shadow 0.3s;
+}
+
+.slot:hover{
+    background:cyan;
+    color:black;
+    transform:scale(1.15);
+    box-shadow:0 0 25px #0ff, 0 0 15px cyan inset;
+}
+
+/* ===== BUTTON ===== */
+.btn{
+    width:260px;
+    padding:16px;
+    margin:14px auto;
+    display:block;
+    border:none;
+    border-radius:30px;
+    background:linear-gradient(45deg,cyan,royalblue);
+    font-size:16px;
+    cursor:pointer;
+    transition:.4s, box-shadow 0.3s;
+    box-shadow:0 0 15px cyan;
+}
+
+.btn:hover{
+    background:linear-gradient(45deg,gold,orange);
+    transform:scale(1.18);
+    box-shadow:0 0 45px gold, 0 0 25px orange inset;
+}
+
+/* ===== KEYFRAMES ===== */
+@keyframes darkFlow{
+    0%{ background-position:0% 50%; }
+    50%{ background-position:100% 50%; }
+    100%{ background-position:0% 50%; }
 }
 </style>
 </head>
 
 <body>
 
-<canvas id="ai-bg"></canvas>
+<!-- BACKGROUND ORBS -->
+<div class="light-orb"></div>
+<div class="light-orb"></div>
+<div class="light-orb"></div>
 
-<div class="intro-overlay" id="intro">
-<h1>BAHRIA COLLEGE EAB-1<br>SECONDARY WING<br>AI BASED PROJECT</h1>
+<div class="cursor"></div>
+
+<!-- CINEMATIC WELCOME -->
+<div id="welcome">
+<h1><U>{WELCOME TO}<BR>{BAHRIA COLLEGE EAB-1}<br>{MAJEED SRE} <br>{SECONDARY-WING}<BR>{AI-PROJECT}</U></h1>
 </div>
 
-<header>
-<img src="./ChatGPT Image Jan 8, 2026, 10_59_36 AM.png" class="college-image">
-</header>
+<!-- HEADER -->
+<div class="header">
+<img src="ChatGPT Image Jan 8, 2026, 10_59_36 AM.png">
+</div>
 
+<!-- LOGO -->
+<div class="logo-container">
+<img src="image_2026-01-08_111429956-removebg-preview.png" class="logo">
+</div>
+
+<!-- CONTENT -->
 <div class="container">
 
 <div class="box">
-<h1>AI INTEGRATION<br>AI TRASH DETECTOR</h1>
+<h2><u>(AI Integration Trash Detector)</u></h2>
+
 </div>
 
 <div class="box">
-<h2>ADMINISTRATORS</h2>
-<div class="names">
-<div class="name-card">PRINCIPAL: MA'AM SABIHA</div>
-<div class="name-card">VICE PRINCIPAL: MA'AM AZRA</div>
-<div class="name-card">SUPERVISOR: SIR ABDUL HAMEED</div>
-</div>
+<h2><u>(Administrators)</u></h2>
+<div class="slot"><b>PRINCIPAL</b>:<U>MA'AM SABIHA</U></div>
+<div class="slot"><b>VICE PRINCIPAL</b>:<u>MA'AM AZRA</u></div>
+<div class="slot"><b>SUPERVISOR</b>:<u>SIR ABDUL HAMEED</u></div>
 </div>
 
 <div class="box">
-<h2>PROJECT CANDIDATES</h2>
-<div class="names">
-<div class="name-card">MUHAMMAD AYYAN AZEEM</div>
-<div class="name-card">MUHAMMAD TALHA KHAN</div>
-<div class="name-card">SAIM MUJAHID</div>
-</div>
+<h2>(Project Candidates)</h2>
+<div class="slot"><U><b>MUHAMMAD AYYAN AZEEM</b></U></div>
+<div class="slot"><U><b>MUHAMMAD TALHA KHAN</U></b></div>
+<div class="slot"><U><b>SAIM MUJAHID</b></U></div>
 </div>
 
-<div class="box btns">
-<a href="https://teachablemachine.withgoogle.com/models/aAcoTnFgA/" target="_blank">Recyclable Detector</a>
-<a href="https://teachablemachine.withgoogle.com/models/3IQwEVojh/" target="_blank">Trash Detector</a>
-</div>
+<div class="box">
+<h2><B>(DETECTORS)</B></h2>
+
+<button class="btn"
+onclick="window.open('https://teachablemachine.withgoogle.com/models/aAcoTnFgA/', '_blank')">
+<u><B>RECYCLABLE TRASH DETECTOR </B></u>
+</button>
+
+<button class="btn"
+onclick="window.open('https://teachablemachine.withgoogle.com/models/3IQwEVojh/', '_blank')">
+<u>MATERIAL DETECTOR</u>
+</button>
 
 </div>
 
-<footer>
-© 2026 Bahria College | AI Integration Project
-</footer>
+</div>
 
 <script>
-/* AI PARTICLES */
-const canvas=document.getElementById("ai-bg");
-const ctx=canvas.getContext("2d");
-canvas.width=innerWidth;
-canvas.height=innerHeight;
-
-let p=[];
-for(let i=0;i<120;i++)
-p.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*2,dx:(Math.random()-.5),dy:(Math.random()-.5)});
-
-function animate(){
-ctx.clearRect(0,0,canvas.width,canvas.height);
-ctx.fillStyle="#4fc3ff";
-p.forEach(a=>{
-ctx.beginPath();
-ctx.arc(a.x,a.y,a.r,0,Math.PI*2);
-ctx.fill();
-a.x+=a.dx; a.y+=a.dy;
-if(a.x<0||a.x>canvas.width) a.dx*=-1;
-if(a.y<0||a.y>canvas.height) a.dy*=-1;
+/* Cursor */
+const cursor=document.querySelector('.cursor');
+document.addEventListener('mousemove',e=>{
+    cursor.style.left=e.clientX+'px';
+    cursor.style.top=e.clientY+'px';
 });
-requestAnimationFrame(animate);
-}
-animate();
 
-/* INTRO HIDE */
-document.getElementById("intro").onclick=()=>document.getElementById("intro").style.display="none";
+/* Scroll reveal */
+const boxes=document.querySelectorAll('.box');
+window.addEventListener('scroll',()=>{
+    boxes.forEach(box=>{
+        if(box.getBoundingClientRect().top < window.innerHeight - 100){
+            box.classList.add('show');
+        }
+    });
+});
 </script>
 
 </body>

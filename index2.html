@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AI Trash Detector</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&display=swap" rel="stylesheet">
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Orbitron', sans-serif;
+}
+
+body{
+    background:radial-gradient(circle at top,#061b5e,#020024);
+    min-height:100vh;
+    color:#e6f3ff;
+    overflow-x:hidden;
+}
+
+/* AI BACKGROUND */
+#ai-bg{
+    position:fixed;
+    inset:0;
+    z-index:-1;
+    opacity:0.35;
+}
+
+/* INTRO */
+.intro-overlay{
+    position:fixed;
+    inset:0;
+    background:#020024;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:999;
+}
+
+.intro-overlay h1{
+    text-align:center;
+    font-size:3rem;
+    color:#4fc3ff;
+    letter-spacing:6px;
+    cursor:pointer;
+    animation:boot 2s infinite alternate;
+}
+
+@keyframes boot{
+    from{opacity:.6;text-shadow:0 0 10px #4fc3ff;}
+    to{opacity:1;text-shadow:0 0 35px #4fc3ff;}
+}
+
+/* HEADER */
+header{
+    padding:25px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:20px;
+}
+
+.college-image{
+    width:100%;
+    max-width:850px;
+    border-radius:18px;
+    box-shadow:0 0 40px rgba(79,195,255,.5);
+    transition:.5s;
+}
+
+.college-image:hover{
+    transform:scale(1.05);
+}
+
+/* MAIN */
+.container{
+    max-width:900px;
+    margin:auto;
+    padding:60px 20px;
+    display:flex;
+    flex-direction:column;
+    gap:45px;
+}
+
+.box{
+    position:relative;
+    background:rgba(10,60,150,.25);
+    backdrop-filter:blur(18px);
+    border-radius:22px;
+    padding:35px;
+    box-shadow:0 0 45px rgba(79,195,255,.35);
+    overflow:hidden;
+}
+
+.box::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:linear-gradient(120deg,transparent,rgba(79,195,255,.3),transparent);
+    animation:scan 3s linear infinite;
+}
+
+@keyframes scan{
+    from{transform:translateX(-100%)}
+    to{transform:translateX(100%)}
+}
+
+h1,h2{
+    text-align:center;
+    animation:glow 2.5s infinite alternate;
+}
+
+@keyframes glow{
+    from{text-shadow:0 0 10px #4fc3ff;}
+    to{text-shadow:0 0 30px #4fc3ff;}
+}
+
+.names{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:20px;
+    margin-top:25px;
+}
+
+.name-card{
+    padding:14px 26px;
+    border-radius:14px;
+    background:rgba(79,195,255,.2);
+    transition:.4s;
+}
+
+.name-card:hover{
+    background:#e6f3ff;
+    color:#020024;
+    transform:scale(1.1);
+}
+
+/* BUTTONS */
+.btns{
+    display:flex;
+    justify-content:center;
+    gap:30px;
+    flex-wrap:wrap;
+}
+
+.btns a{
+    padding:18px 45px;
+    text-decoration:none;
+    font-size:1.2rem;
+    color:white;
+    border-radius:50px;
+    background:linear-gradient(135deg,#4fc3ff,#1a5cff);
+    box-shadow:0 0 30px #4fc3ff;
+    transition:.4s;
+}
+
+.btns a:hover{
+    background:#e6f3ff;
+    color:#1a5cff;
+    transform:scale(1.1);
+}
+
+footer{
+    text-align:center;
+    padding:20px;
+    opacity:.85;
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="ai-bg"></canvas>
+
+<div class="intro-overlay" id="intro">
+<h1>BAHRIA COLLEGE EAB-1<br>SECONDARY WING<br>AI BASED PROJECT</h1>
+</div>
+
+<header>
+<img src="./ChatGPT Image Jan 8, 2026, 10_59_36 AM.png" class="college-image">
+</header>
+
+<div class="container">
+
+<div class="box">
+<h1>AI INTEGRATION<br>AI TRASH DETECTOR</h1>
+</div>
+
+<div class="box">
+<h2>ADMINISTRATORS</h2>
+<div class="names">
+<div class="name-card">PRINCIPAL: MA'AM SABIHA</div>
+<div class="name-card">VICE PRINCIPAL: MA'AM AZRA</div>
+<div class="name-card">SUPERVISOR: SIR ABDUL HAMEED</div>
+</div>
+</div>
+
+<div class="box">
+<h2>PROJECT CANDIDATES</h2>
+<div class="names">
+<div class="name-card">MUHAMMAD AYYAN AZEEM</div>
+<div class="name-card">MUHAMMAD TALHA KHAN</div>
+<div class="name-card">SAIM MUJAHID</div>
+</div>
+</div>
+
+<div class="box btns">
+<a href="https://teachablemachine.withgoogle.com/models/o8lTwbSfQ/" target="_blank">Recyclable Detector</a>
+<a href="https://teachablemachine.withgoogle.com/models/QJTKdhXBA/" target="_blank">Trash Detector</a>
+</div>
+
+</div>
+
+<footer>
+© 2026 Bahria College | AI Integration Project
+</footer>
+
+<script>
+/* AI PARTICLES */
+const canvas=document.getElementById("ai-bg");
+const ctx=canvas.getContext("2d");
+canvas.width=innerWidth;
+canvas.height=innerHeight;
+
+let p=[];
+for(let i=0;i<120;i++)
+p.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*2,dx:(Math.random()-.5),dy:(Math.random()-.5)});
+
+function animate(){
+ctx.clearRect(0,0,canvas.width,canvas.height);
+ctx.fillStyle="#4fc3ff";
+p.forEach(a=>{
+ctx.beginPath();
+ctx.arc(a.x,a.y,a.r,0,Math.PI*2);
+ctx.fill();
+a.x+=a.dx; a.y+=a.dy;
+if(a.x<0||a.x>canvas.width) a.dx*=-1;
+if(a.y<0||a.y>canvas.height) a.dy*=-1;
+});
+requestAnimationFrame(animate);
+}
+animate();
+
+/* INTRO HIDE */
+document.getElementById("intro").onclick=()=>document.getElementById("intro").style.display="none";
+</script>
+
+</body>
+</html>
